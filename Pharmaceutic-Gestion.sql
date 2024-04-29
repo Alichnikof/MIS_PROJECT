@@ -8,15 +8,12 @@ CREATE TABLE Person (
 CREATE TABLE Patient (
     idpatient INTEGER PRIMARY KEY,
     idperson INTEGER,
-    phonenumber INTEGER,
-    is_active BOOLEAN,
     FOREIGN KEY (idperson) REFERENCES Person(idperson)
 );
  
 CREATE TABLE Doctor (
     iddoctor INTEGER PRIMARY KEY,
     idperson INTEGER,
-    inami INTEGER,
     speciality TEXT,
     FOREIGN KEY (idperson) REFERENCES Person(idperson)
 );
@@ -31,22 +28,10 @@ CREATE TABLE Pharmacist (
 
 CREATE TABLE Medicine (
     id_medicine INTEGER PRIMARY KEY,
-    name TEXT,
+    Med_name TEXT,
     content_quantity INTEGER,
     out_of_stock BOOLEAN,
     FOREIGN KEY (idpharmacist) REFERENCES Pharmacist(idpharmacist)
-);
-
-CREATE TABLE Appointment (
-    id_appointment INTEGER PRIMARY KEY,
-    idpatient INTEGER,
-    iddoctor INTEGER,
-    appointment_date DATE,
-    appointment_time TIME,
-    reason TEXT,
-    prescription_status TEXT, -- Added field for prescription status
-    FOREIGN KEY (idpatient) REFERENCES Patient(idpatient),
-    FOREIGN KEY (iddoctor) REFERENCES Doctor(iddoctor)
 );
 
 CREATE TABLE Prescription (
