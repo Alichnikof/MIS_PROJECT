@@ -1,55 +1,100 @@
 import sqlite3
 
 # Connect to or create a SQLite database
-conn = sqlite3.connect('Pharmaceutic-Database.db')
+conn = sqlite3.connect('PharmacyGestion400.db')
 cur = conn.cursor()
 
-# Load SQL script from file
-with open("Pharmaceutic-Gestion.sql") as file:
-    sql_script = file.read()
+# Create tables
+cur.execute('''CREATE TABLE IF NOT EXISTS Person (
+                    idperson INTEGER PRIMARY KEY,
+                    firstname TEXT,
+                    familyname TEXT,
+                    dateofbirth DATE
+                )''')
 
-# Execute script to create database schema
-cur.executescript(sql_script)
+cur.execute('''CREATE TABLE IF NOT EXISTS Patient (
+                    idpatient INTEGER PRIMARY KEY,
+                    idperson INTEGER,
+                    FOREIGN KEY (idperson) REFERENCES Person(idperson)
+                )''')
 
-# 2. Prepare SQL INSERT queries for Patient, Doctor and Credentials tables
-# Define sample data for patients, doctors, and credentials
-patient_data = [
-    (None, 1, '123456789', '1990-01-01', 'John', 'Doe', 1),
-    (None, 2, '987654321', '1985-05-15', 'Jane', 'Smith', 1)
-]
+cur.execute('''CREATE TABLE IF NOT EXISTS Doctor (
+                    iddoctor INTEGER PRIMARY KEY,
+                    idperson INTEGER,
+                    speciality TEXT,
+                    FOREIGN KEY (idperson) REFERENCES Person(idperson)
+                )''')
 
-doctor_data = [
-    (None, 3, 'INAMI123', 'Cardiology', 'Dr. Smith', 'Flyzer'),
-    (None, 4, 'INAMI456', 'Pediatrics', 'Dr. Johnson', 'Johnson')
-]
+cur.execute('''CREATE TABLE IF NOT EXISTS Pharmacist (
+                    idpharmacist INTEGER PRIMARY KEY,
+                    idperson INTEGER,
+                    pharmacy_name TEXT,
+                    pharmacy_location TEXT,
+                    FOREIGN KEY (idperson) REFERENCES Person(idperson)
+                )''')
 
-credentials_data = [
-    (None, 'doctor@example.com', 'doctor123', 'Doctor'),
-    (None, 'patient@example.com', 'patient123', 'Patient'),
-    (None, 'admin@example.com', 'admin123', 'Admin')
-]
+cur.execute('''CREATE TABLE IF NOT EXISTS Medicine (
+                    id_medicine INTEGER PRIMARY KEY,
+                    Med_name TEXT,
+                    content_quantity INTEGER,
+                    out_of_stock BOOLEAN,
+                    idpharmacist INTEGER,
+                    FOREIGN KEY (idpharmacist) REFERENCES Pharmacist(idpharmacist)
+                )''')
 
-# Insert data into Patient table
-cur.executemany('''INSERT INTO Patient (idpatient, idperson, phonenumber, p_dateofbirth, p_name, p_lastname, is_active)
-                   VALUES (?, ?, ?, ?, ?, ?, ?)''', patient_data)
+cur.execute('''CREATE TABLE IF NOT EXISTS Prescription (
+                    id_prescription INTEGER PRIMARY KEY,
+                    idpatient INTEGER,
+                    idpharmacist INTEGER,
+                    id_medicine INTEGER,
+                    quantity INTEGER,
+                    FOREIGN KEY (idpatient) REFERENCES Patient(idpatient),
+                    FOREIGN KEY (idpharmacist) REFERENCES Pharmacist(idpharmacist),
+                    FOREIGN KEY (id_medicine) REFERENCES Medicine(id_medicine)
+                )''')
 
-# Insert data into Doctor table
-cur.executemany('''INSERT INTO Doctor (iddoctor, idperson, inami, speciality, d_name, d_lastname)
-                   VALUES (?, ?, ?, ?, ?, ?)''', doctor_data)
+cur.execute('''CREATE TABLE IF NOT EXISTS Credentials (
+                    id INTEGER PRIMARY KEY,
+                    email TEXT UNIQUE,
+                    password TEXT,
+                    user_type TEXT
+                )''')
 
-# Insert data into Credentials table
-cur.executemany('''INSERT INTO Credentials (id, email, password, user_type)
-                   VALUES (?, ?, ?, ?)''', credentials_data)
+# Insert sample data
+person_data = [('John', 'Doe', '1990-01-01'), ('Jane', 'Smith', '1985-05-15'), ('Dr. Smith', '', ''), ('Dr. Johnson', '', ''), ('Pharmacist Name', '', '')]
 
-# 3. Relay information into Person table
-# Inserting combined data from Patient and Doctor tables into Person table
-cur.execute('''INSERT INTO Person (idperson, idpatient, iddoctor, firstname, familyname, dateofbirth)
-               SELECT idperson, idpatient, NULL, p_name, p_lastname, p_dateofbirth FROM Patient
-               UNION
-               SELECT idperson, NULL, iddoctor, d_name, d_lastname, NULL FROM Doctor''')
+cur.executemany('''INSERT INTO Person (firstname, familyname, dateofbirth)
+                   VALUES (?, ?, ?)''', person_data)
 
-#Execute script
-cur.executescript(sql_script)
+patient_data = [(1,), (2,)]
+
+cur.executemany('''INSERT INTO Patient (idperson)
+                   VALUES (?)''', patient_data)
+
+doctor_data = [(3, 'Cardiology'), (4, 'Pediatrics')]
+
+cur.executemany('''INSERT INTO Doctor (idperson, speciality)
+                   VALUES (?, ?)''', doctor_data)
+
+pharmacist_data = [(5, 'Pharmacy A', 'Location A')]
+
+cur.executemany('''INSERT INTO Pharmacist (idperson, pharmacy_name, pharmacy_location)
+                   VALUES (?, ?, ?)''', pharmacist_data)
+
+medicine_data = [('Paracetamol', 20, 0, 1), ('Amoxicillin', 15, 0, 1)]
+
+cur.executemany('''INSERT INTO Medicine (Med_name, content_quantity, out_of_stock, idpharmacist)
+                   VALUES (?, ?, ?, ?)''', medicine_data)
+
+prescription_data = [(1, 1, 1, 2), (2, 2, 1, 1)]
+
+cur.executemany('''INSERT INTO Prescription (idpatient, idpharmacist, id_medicine, quantity)
+                   VALUES (?, ?, ?, ?)''', prescription_data)
+
+credentials_data = [('pharmacist@example.com', 'pharmacist123', 'Pharmacist'), ('doctor@example.com', 'doctor123', 'Doctor'), ('patient@example.com', 'patient123', 'Patient')]
+
+cur.executemany('''INSERT INTO Credentials (email, password, user_type)
+                   VALUES (?, ?, ?)''', credentials_data)
 
 # Commit changes to the database
 conn.commit()
