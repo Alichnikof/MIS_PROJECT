@@ -1,104 +1,133 @@
-import sqlite3
+import sqlite3 as sq
+import os
 
-# Connect to or create a SQLite database
-conn = sqlite3.connect('PharmacyGestion400.db')
-cur = conn.cursor()
+# Path correction using raw string or replace with forward slashes
+database_path = 'pharmacydatabase.db'
+# or "Lab 3/healthdatabase (1).sql"
+sql_script_path = r"MIS_PROJECT\data\Pharmacy.sql"
 
-# Create tables
-cur.execute('''CREATE TABLE IF NOT EXISTS Person (
-                    idperson INTEGER PRIMARY KEY,
-                    firstname TEXT,
-                    familyname TEXT,
-                    dateofbirth DATE
-                )''')
+# Check if the database file exists
+if not os.path.exists(database_path):
+    # Connect to or create a SQLite database
+    conn = sq.connect(database_path)
+    cursor = conn.cursor()
 
-cur.execute('''CREATE TABLE IF NOT EXISTS Patient (
-                    idpatient INTEGER PRIMARY KEY,
-                    idperson INTEGER,
-                    FOREIGN KEY (idperson) REFERENCES Person(idperson)
-                )''')
+    # Load SQL script from file
+    with open(sql_script_path) as file:
+        sql_script = file.read()
 
-cur.execute('''CREATE TABLE IF NOT EXISTS Doctor (
-                    iddoctor INTEGER PRIMARY KEY,
-                    idperson INTEGER,
-                    speciality TEXT,
-                    FOREIGN KEY (idperson) REFERENCES Person(idperson)
-                )''')
+    # Execute script
+    cursor.executescript(sql_script)
 
-cur.execute('''CREATE TABLE IF NOT EXISTS Pharmacist (
-                    idpharmacist INTEGER PRIMARY KEY,
-                    idperson INTEGER,
-                    pharmacy_name TEXT,
-                    pharmacy_location TEXT,
-                    FOREIGN KEY (idperson) REFERENCES Person(idperson)
-                )''')
+    # Commit the changes and close within the if block
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-cur.execute('''CREATE TABLE IF NOT EXISTS Medicine (
-                    id_medicine INTEGER PRIMARY KEY,
-                    Med_name TEXT,
-                    content_quantity INTEGER,
-                    out_of_stock BOOLEAN,
-                    idpharmacist INTEGER,
-                    FOREIGN KEY (idpharmacist) REFERENCES Pharmacist(idpharmacist)
-                )''')
+# Reconnect to ensure the connection is always defined
+conn = sq.connect(database_path)
+cursor = conn.cursor()
 
-cur.execute('''CREATE TABLE IF NOT EXISTS Prescription (
-                    id_prescription INTEGER PRIMARY KEY,
-                    idpatient INTEGER,
-                    idpharmacist INTEGER,
-                    id_medicine INTEGER,
-                    quantity INTEGER,
-                    FOREIGN KEY (idpatient) REFERENCES Patient(idpatient),
-                    FOREIGN KEY (idpharmacist) REFERENCES Pharmacist(idpharmacist),
-                    FOREIGN KEY (id_medicine) REFERENCES Medicine(id_medicine)
-                )''')
+# Insert example data
 
-cur.execute('''CREATE TABLE IF NOT EXISTS Credentials (
-                    id INTEGER PRIMARY KEY,
-                    email TEXT UNIQUE,
-                    password TEXT,
-                    user_type TEXT
-                )''')
+# Inserting example persons
+cursor.execute(
+    "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('John', 'Doe', '1980-01-15')")
+cursor.execute(
+    "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('Jane', 'Smith', '1975-05-20')")
+cursor.execute(
+    "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('Alice', 'Johnson', '1990-08-10')")
+cursor.execute(
+    "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('Bob', 'Williams', '1988-03-25')")
+cursor.execute(
+    "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('Emma', 'Brown', '1992-11-05')")
+cursor.execute(
+    "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('Michael', 'Clark', '1985-09-12')")
+cursor.execute(
+    "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('Sophia', 'Martinez', '1983-07-30')")
+cursor.execute(
+    "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('Daniel', 'Garcia', '1995-04-18')")
 
-# Insert sample data
-person_data = [('John', 'Doe', '1990-01-01'), ('Jane', 'Smith', '1985-05-15'), ('Dr. Smith', '', ''), ('Dr. Johnson', '', ''), ('Pharmacist Name', '', '')]
+# Inserting example doctors
+cursor.execute(
+    "INSERT INTO Doctor (idperson, speciality) VALUES (1, 'Oncologist')")
+cursor.execute(
+    "INSERT INTO Doctor (idperson, speciality) VALUES (2, 'Pediatrician')")
 
-cur.executemany('''INSERT INTO Person (firstname, familyname, dateofbirth)
-                   VALUES (?, ?, ?)''', person_data)
+# Inserting example patients
+for i in range(3, 9):
+    cursor.execute(f"INSERT INTO Patient (idperson) VALUES ({i})")
 
-patient_data = [(1,), (2,)]
+# Assigning patients to doctors
+cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (1, 3)")
+cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (1, 4)")
+cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (1, 5)")
+cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (2, 6)")
+cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (2, 7)")
+cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (2, 8)")
 
-cur.executemany('''INSERT INTO Patient (idperson)
-                   VALUES (?)''', patient_data)
+# Inserting example medicines
+cursor.execute(
+    "INSERT INTO Medicine (Med_name, content_quantity, out_of_stock) VALUES ('Paracetamol', 100, 0)")
+cursor.execute(
+    "INSERT INTO Medicine (Med_name, content_quantity, out_of_stock) VALUES ('Amoxicillin', 50, 1)")
+cursor.execute(
+    "INSERT INTO Medicine (Med_name, content_quantity, out_of_stock) VALUES ('Aspirin', 75, 0)")
 
-doctor_data = [(3, 'Cardiology'), (4, 'Pediatrics')]
+# Making prescriptions from doctors to patients
+cursor.execute(
+    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (3, 1, 2)")
+cursor.execute(
+    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (4, 2, 1)")
+cursor.execute(
+    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (5, 3, 3)")
+cursor.execute(
+    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (6, 1, 1)")
+cursor.execute(
+    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (7, 2, 2)")
+cursor.execute(
+    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (8, 3, 1)")
 
-cur.executemany('''INSERT INTO Doctor (idperson, speciality)
-                   VALUES (?, ?)''', doctor_data)
+# Inserting example pharmacist
+cursor.execute("INSERT INTO Pharmacist (idperson) VALUES (9)")
 
-pharmacist_data = [(5, 'Pharmacy A', 'Location A')]
+# Insert example credentials for patients
+patients_credentials = [
+    # Assuming the ID of the first patient is 3
+    ('patient1@example.com', 'password', 'patient', 3),
+    # Assuming the ID of the second patient is 4
+    ('patient2@example.com', 'password', 'patient', 4),
+    # Assuming the ID of the third patient is 5
+    ('patient3@example.com', 'password', 'patient', 5),
+    # Add more patients as needed
+]
 
-cur.executemany('''INSERT INTO Pharmacist (idperson, pharmacy_name, pharmacy_location)
-                   VALUES (?, ?, ?)''', pharmacist_data)
+# Insert credentials for patients
+cursor.executemany(
+    "INSERT INTO Credentials (email, password, user_type, person_id) VALUES (?, ?, ?, ?)", patients_credentials)
 
-medicine_data = [('Paracetamol', 20, 0, 1), ('Amoxicillin', 15, 0, 1)]
+# Insert example credentials for doctors
+doctors_credentials = [
+    # Assuming the ID of the first doctor is 1
+    ('doctor1@example.com', 'password', 'doctor', 1),
+    # Assuming the ID of the second doctor is 2
+    ('doctor2@example.com', 'password', 'doctor', 2),
+    # Assuming the ID of the third doctor is 3
+    ('doctor3@example.com', 'password', 'doctor', 3),
+    # Add more doctors as needed
+]
 
-cur.executemany('''INSERT INTO Medicine (Med_name, content_quantity, out_of_stock, idpharmacist)
-                   VALUES (?, ?, ?, ?)''', medicine_data)
+cursor.executemany(
+    "INSERT INTO Credentials (email, password, user_type, person_id) VALUES (?, ?, ?, ?)", doctors_credentials)
 
-prescription_data = [(1, 1, 1, 2), (2, 2, 1, 1)]
+pharmacists_credentials = [
+    ('pharmacist1@example.com', 'password', 'pharmacist', 9)]
+cursor.executemany(
+    "INSERT INTO Credentials (email, password, user_type, person_id) VALUES (?, ?, ?,?)", pharmacists_credentials)
 
-cur.executemany('''INSERT INTO Prescription (idpatient, idpharmacist, id_medicine, quantity)
-                   VALUES (?, ?, ?, ?)''', prescription_data)
-
-credentials_data = [('pharmacist@example.com', 'pharmacist123', 'Pharmacist'), ('doctor@example.com', 'doctor123', 'Doctor'), ('patient@example.com', 'patient123', 'Patient')]
-
-cur.executemany('''INSERT INTO Credentials (email, password, user_type)
-                   VALUES (?, ?, ?)''', credentials_data)
-
-# Commit changes to the database
+# Commit the changes
 conn.commit()
 
-# Close the connection
-cur.close()
+# Close the connection when done
+cursor.close()
 conn.close()
