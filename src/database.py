@@ -47,6 +47,8 @@ cursor.execute(
     "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('Sophia', 'Martinez', '1983-07-30')")
 cursor.execute(
     "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('Daniel', 'Garcia', '1995-04-18')")
+cursor.execute(
+    "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('Pharma', 'Prout', '1998-08-18')")
 
 # Inserting example doctors
 cursor.execute(
@@ -93,13 +95,20 @@ cursor.execute("INSERT INTO Pharmacist (idperson) VALUES (9)")
 
 # Insert example credentials for patients
 patients_credentials = [
-    # Assuming the ID of the first patient is 3
+
     ('patient1@example.com', 'password', 'patient', 3),
-    # Assuming the ID of the second patient is 4
+
     ('patient2@example.com', 'password', 'patient', 4),
-    # Assuming the ID of the third patient is 5
+
     ('patient3@example.com', 'password', 'patient', 5),
-    # Add more patients as needed
+
+    ('patient4@example.com', 'password', 'patient', 6),
+
+    ('patient5@example.com', 'password', 'patient', 7),
+
+    ('patient6@example.com', 'password', 'patient', 8),
+
+
 ]
 
 # Insert credentials for patients
@@ -112,9 +121,7 @@ doctors_credentials = [
     ('doctor1@example.com', 'password', 'doctor', 1),
     # Assuming the ID of the second doctor is 2
     ('doctor2@example.com', 'password', 'doctor', 2),
-    # Assuming the ID of the third doctor is 3
-    ('doctor3@example.com', 'password', 'doctor', 3),
-    # Add more doctors as needed
+
 ]
 
 cursor.executemany(

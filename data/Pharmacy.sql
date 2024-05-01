@@ -55,5 +55,5 @@ CREATE TABLE Credentials (
     password VARCHAR,
     user_type VARCHAR,
     person_id INTEGER,
-    FOREIGN KEY (person_id) REFERENCES Person(id)
+    FOREIGN KEY (person_id) REFERENCES Person(idperson) -- Linking person_id to idperson in Person table
 );
