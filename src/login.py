@@ -19,8 +19,6 @@ class LoginPortal:
             row=0, column=0, padx=5, pady=5, sticky=tk.E)
         tk.Label(root, text="Password:").grid(
             row=1, column=0, padx=5, pady=5, sticky=tk.E)
-        tk.Label(root, text="User Type:").grid(
-            row=2, column=0, padx=5, pady=5, sticky=tk.E)
 
         # Create entry fields
         self.email_entry = tk.Entry(root)
