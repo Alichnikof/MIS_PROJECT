@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 import sqlite3
+from patient_main_page import PatientMainPage
+from doctor_main_page import DoctorMainPage
 
 
 class LoginPortal:
@@ -51,9 +53,13 @@ class LoginPortal:
         if user:
             tk.messagebox.showinfo("Login Successful", f"Welcome, {user[5]}")
             if user[3] == "patient":
-                print("patient")
+                patient_id = user[0]
+                patient_main_page = PatientMainPage(patient_id)
+                patient_main_page.run()
             elif user[3] == "doctor":
-                pass
+                doctor_id = user[0]
+                doctor_main_page = DoctorMainPage(doctor_id)
+                doctor_main_page.run()
             elif user[3] == "pharmacist":
                 pass
         else:
@@ -211,7 +217,7 @@ class LoginPortal:
 def main():
     # Create and run the login portal
     root = tk.Tk()
-    root.geometry("400x300")
+    root.geometry("800x300")
     app = LoginPortal(root)
     root.mainloop()
 

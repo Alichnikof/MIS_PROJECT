@@ -31,6 +31,13 @@ CREATE TABLE Medicine (
     out_of_stock BOOLEAN
 );
 
+CREATE TABLE PatientMedication (
+    idpatient INTEGER,
+    id_medicine INTEGER,
+    FOREIGN KEY (idpatient) REFERENCES Patient(idpatient),
+    FOREIGN KEY (id_medicine) REFERENCES Medicine(id_medicine)
+);
+
 CREATE TABLE DoctorPatient (
     iddoctor INTEGER,
     idpatient INTEGER,
