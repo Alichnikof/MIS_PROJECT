@@ -1,6 +1,5 @@
-from tkinter import Button, Label, Frame, Scrollbar, Listbox, END, messagebox
-
 from main_page import MainPage, messagebox, sqlite3
+from tkinter import Button, Label, Frame, Scrollbar, Listbox, END, messagebox, ttk
 
 
 class DoctorMainPage(MainPage):
@@ -18,9 +17,9 @@ class DoctorMainPage(MainPage):
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT Person.firstname, Patient.idpatient
-                FROM Person
-                INNER JOIN DoctorPatient ON Person.idperson = DoctorPatient.idpatient
-                INNER JOIN Patient ON DoctorPatient.idpatient = Patient.idpatient
+                FROM Patient
+                INNER JOIN DoctorPatient ON Patient.idpatient = DoctorPatient.idpatient
+                INNER JOIN Person ON Patient.idperson = Person.idperson
                 WHERE DoctorPatient.iddoctor = ?""", (self.doctor_id,))
             self.patients = cursor.fetchall()  # Store patients in attribute
 
@@ -29,19 +28,16 @@ class DoctorMainPage(MainPage):
             self.patients_label = Label(
                 self.patients_frame, text="Patients List:")
             self.patients_label.pack(side="left")
-            self.patients_listbox = Listbox(
-                self.patients_frame, width=40, height=10)
-            self.patients_listbox.pack(side="left", fill="both", expand=True)
-            scrollbar = Scrollbar(self.patients_frame, orient="vertical")
-            scrollbar.config(command=self.patients_listbox.yview)
-            scrollbar.pack(side="right", fill="y")
-            self.patients_listbox.config(yscrollcommand=scrollbar.set)
 
-            for patient in self.patients:
-                self.patients_listbox.insert(END, patient[0])
+            # Create a dropdown menu for patients
+            self.patients_combobox = ttk.Combobox(
+                self.patients_frame, width=40, state="readonly")
+            self.patients_combobox['values'] = [patient[0]
+                                                for patient in self.patients]
+            self.patients_combobox.pack(side="left", fill="both", expand=True)
 
-            self.patients_listbox.bind(
-                "<<ListboxSelect>>", self.on_patient_select)
+            self.patients_combobox.bind(
+                "<<ComboboxSelected>>", self.on_patient_select)
 
         except sqlite3.Error as e:
             print("Database error:", e)
@@ -65,6 +61,7 @@ class DoctorMainPage(MainPage):
                 "Error", "Please select a medication to prescribe.")
             return
 
+        # Corrected to retrieve idpatient
         patient_id = self.selected_patient[1]
         medication_id = self.selected_medication[1]
 
@@ -74,6 +71,8 @@ class DoctorMainPage(MainPage):
             cursor.execute(
                 "SELECT * FROM Prescription WHERE idpatient=? AND id_medicine=?", (patient_id, medication_id))
             existing_prescription = cursor.fetchone()
+
+            # Check if the prescription exists and is retrieved correctly
             if existing_prescription:
                 cursor.execute(
                     "UPDATE Prescription SET quantity = quantity + 1 WHERE id_prescription=?", (existing_prescription[0],))
@@ -83,7 +82,7 @@ class DoctorMainPage(MainPage):
 
             conn.commit()
             messagebox.showinfo(
-                "Prescription", f"Prescription added for Patient ID {patient_id} for Medication ID {medication_id}.")
+                "Prescription", f"Prescription has been sent to the patient")
 
         except sqlite3.Error as e:
             messagebox.showerror("Error", f"Database error: {e}")
@@ -92,17 +91,20 @@ class DoctorMainPage(MainPage):
             conn.close()
 
     def on_patient_select(self, event):
-        selected_index = self.patients_listbox.curselection()
-        if selected_index:
-            self.selected_patient = self.patients[selected_index[0]]
+        selected_patient_name = self.patients_combobox.get()
+        if selected_patient_name:
+            self.selected_patient = next(
+                (patient for patient in self.patients if patient[0] == selected_patient_name), None)
         else:
             self.selected_patient = None
 
     def on_medication_select(self, event):
         selected_index = self.medication_listbox.curselection()
         if selected_index:
+            # Incrementing the selected_index by 1 to match the medication ID in the database
+            medication_id = selected_index[0] + 1
             self.selected_medication = (
-                self.medication_listbox.get(selected_index[0]), selected_index[0])
+                self.medication_listbox.get(selected_index[0]), medication_id)
         else:
             self.selected_medication = None
 

@@ -14,7 +14,6 @@ CREATE TABLE Patient (
 CREATE TABLE Doctor (
     iddoctor INTEGER PRIMARY KEY AUTOINCREMENT,
     idperson INTEGER,
-    speciality TEXT,
     FOREIGN KEY (idperson) REFERENCES Person(idperson)
 );
  
@@ -27,8 +26,7 @@ CREATE TABLE Pharmacist (
 CREATE TABLE Medicine (
     id_medicine INTEGER PRIMARY KEY AUTOINCREMENT,
     Med_name TEXT,
-    content_quantity INTEGER,
-    out_of_stock BOOLEAN
+    content_quantity INTEGER
 );
 
 CREATE TABLE PatientMedication (

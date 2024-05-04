@@ -7,7 +7,7 @@ class MainPage:
         self.root = Tk()
         self.root.title(f"{user_type.capitalize()} Main Page")
 
-        Label(self.root, text=f"Welcome, {user_type.capitalize()}!").pack()
+        # Label(self.root, text=f"Welcome, {user_type.capitalize()}!").pack()
 
         self.medication_frame = Frame(self.root)
         self.medication_frame.pack(pady=10)
@@ -31,10 +31,16 @@ class MainPage:
         try:
             conn = sqlite3.connect("pharmacydatabase.db")
             cursor = conn.cursor()
-            cursor.execute("SELECT Med_name FROM Medicine")
-            medicines = cursor.fetchall()
 
-            for medication in medicines:
+            # Clear the existing list of medications
+            self.medication_listbox.delete(0, END)
+
+            # Retrieve the list of medications from the database
+            cursor.execute("SELECT Med_name FROM Medicine")
+            medications = cursor.fetchall()
+
+            # Populate the medication listbox with the retrieved medications
+            for medication in medications:
                 self.medication_listbox.insert(END, medication[0])
 
         except sqlite3.Error as e:
@@ -42,5 +48,3 @@ class MainPage:
 
         finally:
             conn.close()
-
-

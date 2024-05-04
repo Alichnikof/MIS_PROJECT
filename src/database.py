@@ -52,43 +52,43 @@ cursor.execute(
 
 # Inserting example doctors
 cursor.execute(
-    "INSERT INTO Doctor (idperson, speciality) VALUES (1, 'Oncologist')")
+    "INSERT INTO Doctor (idperson) VALUES (1)")
 cursor.execute(
-    "INSERT INTO Doctor (idperson, speciality) VALUES (2, 'Pediatrician')")
+    "INSERT INTO Doctor (idperson) VALUES (2)")
 
 # Inserting example patients
 for i in range(3, 9):
     cursor.execute(f"INSERT INTO Patient (idperson) VALUES ({i})")
 
 # Assigning patients to doctors
+cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (1, 1)")
+cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (1, 2)")
 cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (1, 3)")
-cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (1, 4)")
-cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (1, 5)")
+cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (2, 4)")
+cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (2, 5)")
 cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (2, 6)")
-cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (2, 7)")
-cursor.execute("INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (2, 8)")
 
 # Inserting example medicines
 cursor.execute(
-    "INSERT INTO Medicine (Med_name, content_quantity, out_of_stock) VALUES ('Paracetamol', 100, 0)")
+    "INSERT INTO Medicine (Med_name, content_quantity) VALUES ('Paracetamol', 5)")
 cursor.execute(
-    "INSERT INTO Medicine (Med_name, content_quantity, out_of_stock) VALUES ('Amoxicillin', 50, 1)")
+    "INSERT INTO Medicine (Med_name, content_quantity) VALUES ('Amoxicillin', 10)")
 cursor.execute(
-    "INSERT INTO Medicine (Med_name, content_quantity, out_of_stock) VALUES ('Aspirin', 75, 0)")
+    "INSERT INTO Medicine (Med_name, content_quantity) VALUES ('Aspirin', 2)")
 
 # Making prescriptions from doctors to patients
 cursor.execute(
-    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (3, 1, 2)")
+    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (1, 1, 2)")
 cursor.execute(
-    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (4, 2, 1)")
+    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (2, 2, 1)")
 cursor.execute(
-    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (5, 3, 3)")
+    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (3, 3, 3)")
 cursor.execute(
-    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (6, 1, 1)")
+    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (1, 3, 1)")
 cursor.execute(
-    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (7, 2, 2)")
+    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (1, 2, 2)")
 cursor.execute(
-    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (8, 3, 1)")
+    "INSERT INTO Prescription (idpatient, id_medicine, quantity) VALUES (4, 3, 1)")
 
 # Inserting example pharmacist
 cursor.execute("INSERT INTO Pharmacist (idperson) VALUES (9)")
