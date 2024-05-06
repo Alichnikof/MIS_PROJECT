@@ -216,6 +216,6 @@ class DoctorMainPage(MainPage): # Subclass of MainPage specifically for doctor u
         finally:
             conn.close()
 
-if __name__ == "__main__": # Create a DoctorMainPage instance and run the application
+if __name__ == "__main__": # Create a DoctorMainPage instance and run the application 
     doctor_main_page = DoctorMainPage(1)
     doctor_main_page.run()
