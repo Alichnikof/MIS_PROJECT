@@ -1,4 +1,4 @@
-# Pharmacy Management System - Login Portal 1
+# Pharmacy Management System - Login Portal 
 import tkinter as tk
 from tkinter import messagebox, ttk
 import sqlite3
