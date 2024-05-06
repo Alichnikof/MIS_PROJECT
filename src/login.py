@@ -3,6 +3,7 @@ from tkinter import messagebox, ttk
 import sqlite3
 from patient_main_page import PatientMainPage
 from doctor_main_page import DoctorMainPage
+from pharmacist_main_page import PharmacistMainPage
 
 
 class LoginPortal:
@@ -61,7 +62,9 @@ class LoginPortal:
                 doctor_main_page = DoctorMainPage(doctor_id)
                 doctor_main_page.run()
             elif user[3] == "pharmacist":
-                pass
+                pharmacist_id = user[0]
+                pharmacist_main_page = PharmacistMainPage(pharmacist_id)
+                pharmacist_main_page.run()
         else:
             tk.messagebox.showerror(
                 "Login Failed", "Incorrect email or password")
@@ -93,7 +96,7 @@ class LoginPortal:
         self.email_var = tk.StringVar()
         self.password_var = tk.StringVar()
         self.user_type_var = tk.StringVar()
-        self.user_types = ["patient", "doctor", "pharmacist"]
+        self.user_types = ["doctor", "pharmacist"]
 
         # Registration form
         tk.Label(self.registration_window, text="First Name:").grid(
@@ -167,9 +170,7 @@ class LoginPortal:
             return
 
         # Determine which table to insert into based on user_type
-        if user_type == "patient":
-            table_name = "Patient"
-        elif user_type == "doctor":
+        if user_type == "doctor":
             table_name = "Doctor"
         elif user_type == "pharmacist":
             table_name = "Pharmacist"

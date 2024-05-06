@@ -25,35 +25,6 @@ class PharmacistMainPage(MainPage):
             self.root, text="Verify Quantity", command=self.verify_quantity)
         self.verify_quantity_button.pack(pady=5)
 
-        '''
-        # Patients List
-        self.patients_frame = Frame(self.root)
-        self.patients_frame.pack(pady=10)
-        self.patients_label = Label(self.patients_frame, text="Patients List:")
-        self.patients_label.pack(side="left")
-        self.patients_listbox = Listbox(
-            self.patients_frame, width=40, height=5, selectmode="single")
-        self.patients_listbox.pack(side="left", fill="both", expand=True)
-        self.populate_patients_list()  # Populate patients list
-        scrollbar = Scrollbar(self.patients_frame, orient="vertical")
-        scrollbar.config(command=self.patients_listbox.yview)
-        scrollbar.pack(side="right", fill="y")
-        self.patients_listbox.config(yscrollcommand=scrollbar.set)
-        # Doctors List
-        self.doctors_frame = Frame(self.root)
-        self.doctors_frame.pack(pady=10)
-        self.doctors_label = Label(self.doctors_frame, text="Doctors List:")
-        self.doctors_label.pack(side="left")
-        self.doctors_listbox = Listbox(
-            self.doctors_frame, width=40, height=5, selectmode="single")
-        self.doctors_listbox.pack(side="left", fill="both", expand=True)
-        self.populate_doctors_list()  # Populate doctors list
-        scrollbar = Scrollbar(self.doctors_frame, orient="vertical")
-        scrollbar.config(command=self.doctors_listbox.yview)
-        scrollbar.pack(side="right", fill="y")
-        self.doctors_listbox.config(yscrollcommand=scrollbar.set)
-        '''
-
     def add_medication(self):
         medication_name = self.add_medication_entry.get().strip()
         if not medication_name:

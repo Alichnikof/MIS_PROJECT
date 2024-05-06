@@ -1,3 +1,4 @@
+import tkinter as tk
 from main_page import MainPage, messagebox, sqlite3
 from tkinter import Button, Label, Frame, Scrollbar, Listbox, END, messagebox, ttk
 
@@ -10,6 +11,17 @@ class DoctorMainPage(MainPage):
         self.selected_medication = None
         self.patients = None  # Initialize patients attribute
         self.populate_patients_list()
+
+        self.prescribe_button = Button(
+            self.root, text="Prescribe Medication", command=self.prescribe_medication)
+        self.prescribe_button.pack(pady=5)
+
+        self.register_patient_button = Button(
+            self.root, text="Register Patient", command=self.open_registration_window)
+        self.register_patient_button.pack(pady=5)
+
+        self.medication_listbox.bind(
+            "<<ListboxSelect>>", self.on_medication_select)
 
     def populate_patients_list(self):
         try:
@@ -44,13 +56,6 @@ class DoctorMainPage(MainPage):
 
         finally:
             conn.close()
-
-        self.prescribe_button = Button(
-            self.root, text="Prescribe Medication", command=self.prescribe_medication)
-        self.prescribe_button.pack(pady=5)
-
-        self.medication_listbox.bind(
-            "<<ListboxSelect>>", self.on_medication_select)
 
     def prescribe_medication(self):
         if not self.selected_patient:
@@ -107,6 +112,128 @@ class DoctorMainPage(MainPage):
                 self.medication_listbox.get(selected_index[0]), medication_id)
         else:
             self.selected_medication = None
+
+    def open_registration_window(self):
+        self.registration_window = tk.Toplevel(self.root)
+        self.registration_window.title("Registration")
+
+        # Entry variables for registration
+        self.first_name_var = tk.StringVar()
+        self.last_name_var = tk.StringVar()
+        self.dob_var = tk.StringVar()
+        self.email_var = tk.StringVar()
+        self.password_var = tk.StringVar()
+
+        # Registration form
+        tk.Label(self.registration_window, text="First Name:").grid(
+            row=0, column=0, sticky="w")
+        self.first_name_entry = tk.Entry(
+            self.registration_window, textvariable=self.first_name_var)
+        self.first_name_entry.grid(row=0, column=1)
+
+        tk.Label(self.registration_window, text="Last Name:").grid(
+            row=1, column=0, sticky="w")
+        self.last_name_entry = tk.Entry(
+            self.registration_window, textvariable=self.last_name_var)
+        self.last_name_entry.grid(row=1, column=1)
+
+        tk.Label(self.registration_window, text="Date of Birth:").grid(
+            row=2, column=0, sticky="w")
+        self.dob_entry = tk.Entry(
+            self.registration_window, textvariable=self.dob_var)
+        self.dob_entry.grid(row=2, column=1)
+
+        tk.Label(self.registration_window, text="Email:").grid(
+            row=3, column=0, sticky="w")
+        self.email_entry = tk.Entry(
+            self.registration_window, textvariable=self.email_var)
+        self.email_entry.grid(row=3, column=1)
+
+        tk.Label(self.registration_window, text="Password:").grid(
+            row=4, column=0, sticky="w")
+        self.password_entry = tk.Entry(
+            self.registration_window, textvariable=self.password_var, show="*")
+        self.password_entry.grid(row=4, column=1)
+
+        tk.Button(self.registration_window, text="Register",
+                  command=self.register_patient).grid(row=6, columnspan=2)
+
+    def register_patient(self):
+        # Get user input
+        first_name = self.first_name_var.get()
+        last_name = self.last_name_var.get()
+        dob = self.dob_var.get()
+        email = self.email_var.get()
+        password = self.password_var.get()
+
+        # Validate user input
+        if not (first_name and last_name and dob and email and password):
+            messagebox.showerror("Error", "Please fill in all fields.")
+            return
+
+        # Insert into Person table
+        try:
+            conn = sqlite3.connect("pharmacydatabase.db")
+            cursor = conn.cursor()
+
+            cursor.execute("INSERT INTO Person (firstname, familyname, dateofbirth) VALUES (?, ?, ?)",
+                           (first_name, last_name, dob))
+            person_id = cursor.lastrowid  # Get the last inserted row id
+
+            conn.commit()
+
+        except sqlite3.Error as e:
+            messagebox.showerror(
+                "Error", f"Error inserting into Person table: {e}")
+            return
+
+        # Insert into Patient table
+        try:
+            cursor.execute("INSERT INTO Patient (idperson) VALUES (?)",
+                           (person_id,))
+            conn.commit()
+        except sqlite3.Error as e:
+            messagebox.showerror(
+                "Error", f"Error inserting into Patient table: {e}")
+            return
+
+        # Insert into Credentials table
+        try:
+            cursor.execute("INSERT INTO Credentials (email, password, user_type, person_id) VALUES (?, ?, ?, ?)",
+                           (email, password, "patient", person_id))
+            conn.commit()
+        except sqlite3.Error as e:
+            messagebox.showerror(
+                "Error", f"Error inserting into Credentials table: {e}")
+            return
+
+        try:
+            # Associate the registered patient with the doctor
+            self.add_patient_to_doctor(person_id)
+            messagebox.showinfo("Success", "Patient registration successful!")
+            self.registration_window.destroy()  # Close registration window
+
+        except sqlite3.Error as e:
+            messagebox.showerror(
+                "Error", f"Error associating patient with doctor: {e}")
+            return
+
+    def add_patient_to_doctor(self, patient_id):
+        try:
+            conn = sqlite3.connect("pharmacydatabase.db")
+            cursor = conn.cursor()
+
+            # Associate the patient with the doctor
+            cursor.execute(
+                "INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (?, ?)", (self.doctor_id, patient_id))
+
+            conn.commit()
+
+        except sqlite3.Error as e:
+            print("Database error:", e)
+
+        finally:
+            conn.close()
 
 
 if __name__ == "__main__":
