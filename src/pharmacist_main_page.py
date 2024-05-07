@@ -7,20 +7,21 @@ from main_page import messagebox
 class PharmacistMainPage(MainPage): # Subclass of MainPage specifically for pharmacist users : Inheritance Object-Oriented Concept used
     def __init__(self):
         super().__init__("pharmacist")  # Call superclass constructor
+        self.root.configure(bg='lightgreen')  # Change la couleur de fond en vert clair
         # Additional UI elements for pharmacist
         # Add Medication Entry and Button
         self.add_medication_entry = Entry(self.root)
         self.add_medication_entry.pack(pady=5)
         self.add_medication_button = Button(
-            self.root, text="Add Medication", command=self.add_medication)
+            self.root, text="Add Medication", command=self.add_medication, bg='Green', fg= 'White')
         self.add_medication_button.pack(pady=5)
         # Add to Stock Button
         self.add_to_stock_button = Button(
-            self.root, text="Add to Stock", command=self.add_to_stock)
+            self.root, text="Add to Stock", command=self.add_to_stock,bg='Green', fg= 'White')
         self.add_to_stock_button.pack(pady=5)
         # Verify Quantity Button
         self.verify_quantity_button = Button(
-            self.root, text="Verify Quantity", command=self.verify_quantity)
+            self.root, text="Verify Quantity", command=self.verify_quantity,bg='Green', fg= 'White')
         self.verify_quantity_button.pack(pady=5)
 
     def add_medication(self): # Function to add new medication

@@ -7,14 +7,15 @@ from main_page import messagebox
 class PatientMainPage(MainPage): # Subclass of MainPage specifically for patient users : Inheritance Object-Oriented Concept used 
     def __init__(self, patient_id):
         super().__init__("patient") # Calling the constructor of the superclass
+        self.root.configure(bg='lightgreen')  # Change la couleur de fond en vert clair
         self.patient_id = patient_id # Storing the patient ID
         # Button for buying medication
         self.buy_button = Button(
-            self.root, text="Buy Medication", command=self.buy_drugs)
+            self.root, text="Buy Medication", command=self.buy_drugs, bg='green', fg = 'White')
         self.buy_button.pack(pady=5)
         # Button for viewing prescription history
         self.prescription_button = Button(
-            self.root, text="View Prescription History", command=self.view_prescription_history)
+            self.root, text="View Prescription History", command=self.view_prescription_history,bg='green', fg = 'White')
         self.prescription_button.pack(pady=5)
 
     def buy_drugs(self): # Function to buy medication

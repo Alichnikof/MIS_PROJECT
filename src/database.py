@@ -5,7 +5,7 @@ import os
 # Path correction using raw string or replace with forward slashes
 database_path = 'pharmacydatabase.db'
 # or "Lab 3/healthdatabase (1).sql"
-sql_script_path = r"MIS_PROJECT\data\Pharmacy.sql"
+sql_script_path = r"c:\Users\imed-\Documents\GitHub\MIS_PROJECT\data\Pharmacy.sql"
 
 # Check if the database file exists
 if not os.path.exists(database_path):

@@ -1,4 +1,4 @@
-# Pharmacy Management System - Login Portal 
+# Pharmacy Management System - Login Portal
 import tkinter as tk
 from tkinter import messagebox, ttk
 import sqlite3
@@ -14,25 +14,29 @@ class LoginPortal: # Class representing the login portal functionality
         self.root = root
         self.root.title("Login Portal") # Set the title of the window
         self.root.geometry("300x200")  # Set the size of the window
+        self.root.configure(bg='lightgreen')  # Change la couleur de fond en vert clair
         # Connect to the database
         self.conn = sqlite3.connect('pharmacydatabase.db')
         self.c = self.conn.cursor()
         # Create labels fpr email and password
-        tk.Label(root, text="email:").grid(
-            row=0, column=0, padx=5, pady=5, sticky=tk.E)
-        tk.Label(root, text="Password:").grid(
+        tk.Label(root, text="email:",bg='lightgreen').grid(
             row=1, column=0, padx=5, pady=5, sticky=tk.E)
+        tk.Label(root, text="Password:",bg='lightgreen').grid(
+            row=2, column=0, padx=5, pady=5, sticky=tk.E)
+        #Create a tilte
+        self.title_label = tk.Label(root, text="Pharmacy Management System", font=("Arial", 15, "bold"), bg='#34eb43', fg='white')
+        self.title_label.grid(row=0, column=0, columnspan=2, pady=10)
         # Create entry fields
         self.email_entry = tk.Entry(root)
-        self.email_entry.grid(row=0, column=1, padx=5, pady=5)
+        self.email_entry.grid(row=1, column=1, padx=5, pady=5)
         self.password_entry = tk.Entry(root, show="*")  # Mask the password
-        self.password_entry.grid(row=1, column=1, padx=5, pady=5)
+        self.password_entry.grid(row=2, column=1, padx=5, pady=5)
         # Create login button
-        self.login_button = tk.Button(root, text="Login", command=self.login)
+        self.login_button = tk.Button(root, text="Login", command=self.login, bg='green',fg='White')
         self.login_button.grid(row=3, column=0, columnspan=2, padx=5, pady=10)
         # Create register button
         self.register_button = tk.Button(
-            root, text="Register", command=self.open_registration_window)
+            root, text="Register", command=self.open_registration_window,bg='green',fg='White')
         self.register_button.grid(
             row=4, column=0, columnspan=2, padx=5, pady=10)
 
@@ -135,7 +139,7 @@ class LoginPortal: # Class representing the login portal functionality
         self.user_type_menu.grid(row=5, column=1)
         # Register Button
         tk.Button(self.registration_window, text="Register",
-                  command=self.register).grid(row=6, columnspan=2)
+                  command=self.register,bg='green',fg='White').grid(row=6, columnspan=2)
 
     def register(self):
         """Register a new user."""

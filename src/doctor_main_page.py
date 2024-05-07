@@ -13,11 +13,11 @@ class DoctorMainPage(MainPage): # Subclass of MainPage specifically for doctor u
         self.populate_patients_list() # Populate patients list
         # Button for Prescribe Medication
         self.prescribe_button = Button(
-            self.root, text="Prescribe Medication", command=self.prescribe_medication)
+            self.root, text="Prescribe Medication", command=self.prescribe_medication,bg='Green', fg= 'White')
         self.prescribe_button.pack(pady=5)
         # Button for Register Patient
         self.register_patient_button = Button(
-            self.root, text="Register Patient", command=self.open_registration_window)
+            self.root, text="Register Patient", command=self.open_registration_window,bg='Green', fg= 'White')
         self.register_patient_button.pack(pady=5)
         # Bind event handler to medication listbox selection
         self.medication_listbox.bind(
