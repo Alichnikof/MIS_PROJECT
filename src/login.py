@@ -7,24 +7,28 @@ from patient_main_page import PatientMainPage
 from doctor_main_page import DoctorMainPage
 from pharmacist_main_page import PharmacistMainPage
 
-class LoginPortal: # Class representing the login portal functionality
+
+class LoginPortal:  # Class representing the login portal functionality
     """Represents the login portal of the Pharmacy Management System."""
+
     def __init__(self, root):
         """Initialize the login portal."""
         self.root = root
-        self.root.title("Login Portal") # Set the title of the window
+        self.root.title("Login Portal")  # Set the title of the window
         self.root.geometry("300x200")  # Set the size of the window
-        self.root.configure(bg='lightgreen')  # Change la couleur de fond en vert clair
+        # Change la couleur de fond en vert clair
+        self.root.configure(bg='lightgreen')
         # Connect to the database
         self.conn = sqlite3.connect('pharmacydatabase.db')
         self.c = self.conn.cursor()
         # Create labels fpr email and password
-        tk.Label(root, text="email:",bg='lightgreen').grid(
+        tk.Label(root, text="email:", bg='lightgreen').grid(
             row=1, column=0, padx=5, pady=5, sticky=tk.E)
-        tk.Label(root, text="Password:",bg='lightgreen').grid(
+        tk.Label(root, text="Password:", bg='lightgreen').grid(
             row=2, column=0, padx=5, pady=5, sticky=tk.E)
-        #Create a tilte
-        self.title_label = tk.Label(root, text="Pharmacy Management System", font=("Arial", 15, "bold"), bg='#34eb43', fg='white')
+        # Create a tilte
+        self.title_label = tk.Label(root, text="Pharmacy Management System", font=(
+            "Arial", 15, "bold"), bg='#34eb43', fg='white')
         self.title_label.grid(row=0, column=0, columnspan=2, pady=10)
         # Create entry fields
         self.email_entry = tk.Entry(root)
@@ -32,11 +36,12 @@ class LoginPortal: # Class representing the login portal functionality
         self.password_entry = tk.Entry(root, show="*")  # Mask the password
         self.password_entry.grid(row=2, column=1, padx=5, pady=5)
         # Create login button
-        self.login_button = tk.Button(root, text="Login", command=self.login, bg='green',fg='White')
+        self.login_button = tk.Button(
+            root, text="Login", command=self.login, bg='green', fg='White')
         self.login_button.grid(row=3, column=0, columnspan=2, padx=5, pady=10)
         # Create register button
         self.register_button = tk.Button(
-            root, text="Register", command=self.open_registration_window,bg='green',fg='White')
+            root, text="Register", command=self.open_registration_window, bg='green', fg='White')
         self.register_button.grid(
             row=4, column=0, columnspan=2, padx=5, pady=10)
 
@@ -46,7 +51,7 @@ class LoginPortal: # Class representing the login portal functionality
         email = self.email_entry.get()
         password = self.password_entry.get()
         # Check for empty fields
-        if not email or not password: # If no email/password inserted
+        if not email or not password:  # If no email/password inserted
             messagebox.showerror(
                 "Error", "Please enter both email and password.")
             return
@@ -67,9 +72,9 @@ class LoginPortal: # Class representing the login portal functionality
             # Pharmacist
             elif user[3] == "pharmacist":
                 pharmacist_id = user[0]
-                pharmacist_main_page = PharmacistMainPage(pharmacist_id)
+                pharmacist_main_page = PharmacistMainPage()
                 pharmacist_main_page.run()
-        else: # Error Message
+        else:  # Error Message
             tk.messagebox.showerror(
                 "Login Failed", "Incorrect email or password")
 
@@ -139,7 +144,7 @@ class LoginPortal: # Class representing the login portal functionality
         self.user_type_menu.grid(row=5, column=1)
         # Register Button
         tk.Button(self.registration_window, text="Register",
-                  command=self.register,bg='green',fg='White').grid(row=6, columnspan=2)
+                  command=self.register, bg='green', fg='White').grid(row=6, columnspan=2)
 
     def register(self):
         """Register a new user."""
@@ -151,11 +156,12 @@ class LoginPortal: # Class representing the login portal functionality
         password = self.password_var.get()
         user_type = self.user_type_menu.get()
         # Validate user input
-        if not (first_name and last_name and dob and email and password and user_type): # If no Credentials inserted
+        # If no Credentials inserted
+        if not (first_name and last_name and dob and email and password and user_type):
             messagebox.showerror("Error", "Please fill in all fields.")
             return
         # Insert into Person table
-        try: # Connect to DB
+        try:  # Connect to DB
             conn = sqlite3.connect("pharmacydatabase.db")
             cursor = conn.cursor()
             cursor.execute("INSERT INTO Person (firstname, familyname, dateofbirth) VALUES (?, ?, ?)",
@@ -163,7 +169,7 @@ class LoginPortal: # Class representing the login portal functionality
             person_id = cursor.lastrowid  # Get the last inserted row id
             conn.commit()
             conn.close()
-        except sqlite3.Error as e: # Error Message
+        except sqlite3.Error as e:  # Error Message
             messagebox.showerror(
                 "Error", f"Error inserting into Person table: {e}")
             return
@@ -172,44 +178,47 @@ class LoginPortal: # Class representing the login portal functionality
             table_name = "Doctor"
         elif user_type == "pharmacist":
             table_name = "Pharmacist"
-        else: # Error Message
+        else:  # Error Message
             messagebox.showerror("Error", "Invalid user type.")
             return
         # Insert into the corresponding user type table
-        try: # Connect to DB
+        try:  # Connect to DB
             conn = sqlite3.connect("pharmacydatabase.db")
             cursor = conn.cursor()
             cursor.execute(f"INSERT INTO {table_name} (idperson) VALUES (?)",
                            (person_id,))
             conn.commit()
-        except sqlite3.Error as e: # Error Message
+        except sqlite3.Error as e:  # Error Message
             messagebox.showerror("Error", f"Error inserting into {
                                  table_name} table: {e}")
             return
         finally:
             conn.close()
         # Insert into Credentials table
-        try: # Connect to DB
+        try:  # Connect to DB
             conn = sqlite3.connect("pharmacydatabase.db")
             cursor = conn.cursor()
             cursor.execute("INSERT INTO Credentials (email, password, user_type, person_id) VALUES (?, ?, ?, ?)",
                            (email, password, user_type, person_id))
             conn.commit()
             conn.close()
-        except sqlite3.Error as e: # Error Message
+        except sqlite3.Error as e:  # Error Message
             messagebox.showerror(
                 "Error", f"Error inserting into Credentials table: {e}")
             return
-        messagebox.showinfo("Success", "Registration successful!") # Success Message
+        # Success Message
+        messagebox.showinfo("Success", "Registration successful!")
         # Optionally, close the registration window after successful registration
         self.registration_window.destroy()
 
+
 def main():
     # Create and run the login portal
-    root = tk.Tk() # Tkinter root window
-    root.geometry("800x300") # Size Window
-    app = LoginPortal(root) # Create an instance of the LoginPortal class
-    root.mainloop() # Event loop
+    root = tk.Tk()  # Tkinter root window
+    root.geometry("800x300")  # Size Window
+    app = LoginPortal(root)  # Create an instance of the LoginPortal class
+    root.mainloop()  # Event loop
+
 
 if __name__ == "__main__":
-    main() # Main call
+    main()  # Main call
