@@ -50,8 +50,8 @@ class PatientMainPage(MainPage):
                         prescription_quantity = prescription_quantity[0]
                         if prescription_quantity > 0:
                             # Insert the purchase record into PatientMedication table
-                            cursor.execute("INSERT INTO PatientMedication (idpatient, id_medicine) VALUES (?, ?)",
-                                           (self.patient_id, medication_id))
+                            cursor.execute("INSERT OR REPLACE INTO PatientMedication (idpatient, id_medicine, quantity) VALUES (?, ?, COALESCE((SELECT quantity FROM PatientMedication WHERE idpatient=? AND id_medicine=?), 0) + 1)",
+                                           (self.patient_id, medication_id, self.patient_id, medication_id))
                             # Decrement the prescription quantity
                             cursor.execute("UPDATE Prescription SET quantity = quantity - 1 WHERE idpatient=? AND id_medicine=?",
                                            (self.patient_id, medication_id,))
@@ -112,18 +112,15 @@ class PatientMainPage(MainPage):
     def view_purchased_medications(self):
         purchased_window = Toplevel(self.root)
         purchased_window.title("Purchased Medications")
-        try:  # Connect to DB
+        try:
             conn = sqlite3.connect("pharmacydatabase.db")
             cursor = conn.cursor()
-            # Query to retrieve medication name and count of purchases by the patient
             cursor.execute("""
-                SELECT Medicine.Med_name, COUNT(PatientMedication.id_medicine) as purchase_count
+                SELECT Medicine.Med_name, quantity
                 FROM PatientMedication
                 INNER JOIN Medicine ON PatientMedication.id_medicine = Medicine.id_medicine
-                WHERE PatientMedication.idpatient = ?
-                GROUP BY Medicine.Med_name""", (self.patient_id,))
+                WHERE PatientMedication.idpatient = ?""", (self.patient_id,))
             purchases = cursor.fetchall()
-            # Display purchased medications in a listbox
             scrollbar = Scrollbar(purchased_window)
             scrollbar.pack(side="right", fill="y")
             purchased_listbox = Listbox(
@@ -133,8 +130,11 @@ class PatientMainPage(MainPage):
                     "end", f"{purchase[0]} - Quantity Purchased: {purchase[1]}")
             purchased_listbox.pack(side="left", fill="both", expand=True)
             scrollbar.config(command=purchased_listbox.yview)
-        except sqlite3.Error as e:  # Error Message
-            messagebox.showerror("Error", f"Database error: {e}")
+        except sqlite3.Error as e:
+            messagebox.showerror("Database Error", f"Database error: {e}")
+        except Exception as e:
+            messagebox.showerror(
+                "Unknown Error", f"An unexpected error occurred: {e}")
         finally:
             conn.close()
 

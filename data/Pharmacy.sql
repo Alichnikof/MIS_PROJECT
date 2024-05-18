@@ -32,9 +32,12 @@ CREATE TABLE Medicine (
 CREATE TABLE PatientMedication (
     idpatient INTEGER,
     id_medicine INTEGER,
+    quantity INTEGER,
+    PRIMARY KEY (idpatient, id_medicine),
     FOREIGN KEY (idpatient) REFERENCES Patient(idpatient),
     FOREIGN KEY (id_medicine) REFERENCES Medicine(id_medicine)
 );
+
 
 CREATE TABLE DoctorPatient (
     iddoctor INTEGER,
