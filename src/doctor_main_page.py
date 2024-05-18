@@ -1,30 +1,34 @@
 # Pharmacy Management System - Doctor Main Page
 import tkinter as tk
-from main_page import MainPage, messagebox, sqlite3 # Importing required modules from the main_page script
-from tkinter import Button, Label, Frame, Scrollbar, Listbox, END, messagebox, ttk
+import re
+# Importing required modules from the main_page script
+from main_page import MainPage, messagebox, sqlite3
+from tkinter import Button, Label, Frame, messagebox, ttk
 
-class DoctorMainPage(MainPage): # Subclass of MainPage specifically for doctor users : Inheritance Object-Oriented Concept used
+
+# Subclass of MainPage specifically for doctor users : Inheritance Object-Oriented Concept used
+class DoctorMainPage(MainPage):
     def __init__(self, doctor_id):
-        super().__init__("doctor") # Call superclass constructor
-        self.doctor_id = doctor_id # Store the doctor ID
-        self.selected_patient = None # Initialize selected patient
-        self.selected_medication = None # Initialize selected medication
+        super().__init__("doctor")  # Call superclass constructor
+        self.doctor_id = doctor_id  # Store the doctor ID
+        self.selected_patient = None  # Initialize selected patient
+        self.selected_medication = None  # Initialize selected medication
         self.patients = None  # Initialize patients attribute
-        self.populate_patients_list() # Populate patients list
+        self.populate_patients_list()  # Populate patients list
         # Button for Prescribe Medication
         self.prescribe_button = Button(
-            self.root, text="Prescribe Medication", command=self.prescribe_medication,bg='Green', fg= 'White')
+            self.root, text="Prescribe Medication", command=self.prescribe_medication, bg='Green', fg='White')
         self.prescribe_button.pack(pady=5)
         # Button for Register Patient
         self.register_patient_button = Button(
-            self.root, text="Register Patient", command=self.open_registration_window,bg='Green', fg= 'White')
+            self.root, text="Register Patient", command=self.open_registration_window, bg='Green', fg='White')
         self.register_patient_button.pack(pady=5)
         # Bind event handler to medication listbox selection
         self.medication_listbox.bind(
             "<<ListboxSelect>>", self.on_medication_select)
 
     def populate_patients_list(self):
-        try: # Connect to DB
+        try:  # Connect to DB
             conn = sqlite3.connect("pharmacydatabase.db")
             cursor = conn.cursor()
             # Retrieve patients associated with the doctor from the database
@@ -45,28 +49,30 @@ class DoctorMainPage(MainPage): # Subclass of MainPage specifically for doctor u
             # Create a dropdown menu for patients
             self.patients_combobox = ttk.Combobox(
                 self.patients_frame, width=40, state="readonly")
-            self.patients_combobox['values'] = [patient[0] for patient in self.patients]
+            self.patients_combobox['values'] = [patient[0]
+                                                for patient in self.patients]
             self.patients_combobox.pack(side="left", fill="both", expand=True)
             # Bind event handler to patient selection
             self.patients_combobox.bind(
                 "<<ComboboxSelected>>", self.on_patient_select)
-        except sqlite3.Error as e: # Error Message
+        except sqlite3.Error as e:  # Error Message
             print("Database error:", e)
         finally:
             conn.close()
 
-    def prescribe_medication(self): # Function to prescribe medication to a patient
-        if not self.selected_patient: # If no patient selected
+    # Function to prescribe medication to a patient
+    def prescribe_medication(self):
+        if not self.selected_patient:  # If no patient selected
             messagebox.showerror("Error", "Please select a patient.")
             return
-        if not self.selected_medication: # If no medication selected
+        if not self.selected_medication:  # If no medication selected
             messagebox.showerror(
                 "Error", "Please select a medication to prescribe.")
             return
         # Corrected to retrieve idpatient
         patient_id = self.selected_patient[1]
         medication_id = self.selected_medication[1]
-        try: # Connect to DB
+        try:  # Connect to DB
             conn = sqlite3.connect("pharmacydatabase.db")
             cursor = conn.cursor()
             cursor.execute(
@@ -83,7 +89,7 @@ class DoctorMainPage(MainPage): # Subclass of MainPage specifically for doctor u
             # Success Message
             messagebox.showinfo(
                 "Prescription", f"Prescription has been sent to the patient")
-        except sqlite3.Error as e: # Error Message
+        except sqlite3.Error as e:  # Error Message
             messagebox.showerror("Error", f"Database error: {e}")
         finally:
             conn.close()
@@ -108,7 +114,8 @@ class DoctorMainPage(MainPage): # Subclass of MainPage specifically for doctor u
         else:
             self.selected_medication = None
 
-    def open_registration_window(self): # Function to open patient registration window
+    # Function to open patient registration window
+    def open_registration_window(self):
         self.registration_window = tk.Toplevel(self.root)
         self.registration_window.title("Registration")
         # Entry variables for registration
@@ -152,7 +159,7 @@ class DoctorMainPage(MainPage): # Subclass of MainPage specifically for doctor u
         tk.Button(self.registration_window, text="Register",
                   command=self.register_patient).grid(row=6, columnspan=2)
 
-    def register_patient(self): # Function to register a new patient
+    def register_patient(self):  # Function to register a new patient
         # Get user input
         first_name = self.first_name_var.get()
         last_name = self.last_name_var.get()
@@ -163,15 +170,19 @@ class DoctorMainPage(MainPage): # Subclass of MainPage specifically for doctor u
         if not (first_name and last_name and dob and email and password):
             messagebox.showerror("Error", "Please fill in all fields.")
             return
+
+        if not self.validate_email(email):
+            messagebox.showerror("Error", "Invalid email format.")
+            return
         # Insert into Person table
-        try: # Connect to DB
+        try:  # Connect to DB
             conn = sqlite3.connect("pharmacydatabase.db")
             cursor = conn.cursor()
             cursor.execute("INSERT INTO Person (firstname, familyname, dateofbirth) VALUES (?, ?, ?)",
                            (first_name, last_name, dob))
             person_id = cursor.lastrowid  # Get the last inserted row id
             conn.commit()
-        except sqlite3.Error as e: # Error Message
+        except sqlite3.Error as e:  # Error Message
             messagebox.showerror(
                 "Error", f"Error inserting into Person table: {e}")
             return
@@ -180,7 +191,7 @@ class DoctorMainPage(MainPage): # Subclass of MainPage specifically for doctor u
             cursor.execute("INSERT INTO Patient (idperson) VALUES (?)",
                            (person_id,))
             conn.commit()
-        except sqlite3.Error as e: # Error Message
+        except sqlite3.Error as e:  # Error Message
             messagebox.showerror(
                 "Error", f"Error inserting into Patient table: {e}")
             return
@@ -189,7 +200,7 @@ class DoctorMainPage(MainPage): # Subclass of MainPage specifically for doctor u
             cursor.execute("INSERT INTO Credentials (email, password, user_type, person_id) VALUES (?, ?, ?, ?)",
                            (email, password, "patient", person_id))
             conn.commit()
-        except sqlite3.Error as e: # Error Message
+        except sqlite3.Error as e:  # Error Message
             messagebox.showerror(
                 "Error", f"Error inserting into Credentials table: {e}")
             return
@@ -198,24 +209,33 @@ class DoctorMainPage(MainPage): # Subclass of MainPage specifically for doctor u
             self.add_patient_to_doctor(person_id)
             messagebox.showinfo("Success", "Patient registration successful!")
             self.registration_window.destroy()  # Close registration window
-        except sqlite3.Error as e: # Error Message
+        except sqlite3.Error as e:  # Error Message
             messagebox.showerror(
                 "Error", f"Error associating patient with doctor: {e}")
             return
 
-    def add_patient_to_doctor(self, patient_id): # Function to associate a patient with the doctor
-        try: # Connect to DB
+    # Function to associate a patient with the doctor
+    def add_patient_to_doctor(self, patient_id):
+        try:  # Connect to DB
             conn = sqlite3.connect("pharmacydatabase.db")
             cursor = conn.cursor()
             # Associate the patient with the doctor
             cursor.execute(
                 "INSERT INTO DoctorPatient (iddoctor, idpatient) VALUES (?, ?)", (self.doctor_id, patient_id))
             conn.commit()
-        except sqlite3.Error as e: # Error Message
+        except sqlite3.Error as e:  # Error Message
             print("Database error:", e)
         finally:
             conn.close()
 
-if __name__ == "__main__": # Create a DoctorMainPage instance and run the application 
+    def validate_email(self, email):
+        """Validate email format and disallow certain special characters."""
+        if re.match(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$", email):
+            if not any(char in email for char in "#!$%&'*+/=?^_`{|}~"):
+                return True
+        return False
+
+
+if __name__ == "__main__":  # Create a DoctorMainPage instance and run the application
     doctor_main_page = DoctorMainPage(1)
     doctor_main_page.run()

@@ -20,6 +20,10 @@ class PatientMainPage(MainPage):
         self.prescription_button = Button(
             self.root, text="View Prescription History", command=self.view_prescription_history, bg='green', fg='White')
         self.prescription_button.pack(pady=5)
+        # Button for viewing purchased medications
+        self.purchased_button = Button(
+            self.root, text="View Purchased Medications", command=self.view_purchased_medications, bg='green', fg='White')
+        self.purchased_button.pack(pady=5)
 
     def buy_drugs(self):  # Function to buy medication
         selected_medication_index = self.medication_listbox.curselection()
@@ -99,6 +103,36 @@ class PatientMainPage(MainPage):
                     "end", f"{prescription[0]} - Quantity: {prescription[1]}")
             prescription_listbox.pack(side="left", fill="both", expand=True)
             scrollbar.config(command=prescription_listbox.yview)
+        except sqlite3.Error as e:  # Error Message
+            messagebox.showerror("Error", f"Database error: {e}")
+        finally:
+            conn.close()
+
+    # Function to view purchased medications
+    def view_purchased_medications(self):
+        purchased_window = Toplevel(self.root)
+        purchased_window.title("Purchased Medications")
+        try:  # Connect to DB
+            conn = sqlite3.connect("pharmacydatabase.db")
+            cursor = conn.cursor()
+            # Query to retrieve medication name and count of purchases by the patient
+            cursor.execute("""
+                SELECT Medicine.Med_name, COUNT(PatientMedication.id_medicine) as purchase_count
+                FROM PatientMedication
+                INNER JOIN Medicine ON PatientMedication.id_medicine = Medicine.id_medicine
+                WHERE PatientMedication.idpatient = ?
+                GROUP BY Medicine.Med_name""", (self.patient_id,))
+            purchases = cursor.fetchall()
+            # Display purchased medications in a listbox
+            scrollbar = Scrollbar(purchased_window)
+            scrollbar.pack(side="right", fill="y")
+            purchased_listbox = Listbox(
+                purchased_window, yscrollcommand=scrollbar.set)
+            for purchase in purchases:
+                purchased_listbox.insert(
+                    "end", f"{purchase[0]} - Quantity Purchased: {purchase[1]}")
+            purchased_listbox.pack(side="left", fill="both", expand=True)
+            scrollbar.config(command=purchased_listbox.yview)
         except sqlite3.Error as e:  # Error Message
             messagebox.showerror("Error", f"Database error: {e}")
         finally:

@@ -1,5 +1,5 @@
 # Pharmacy Management System - Pharmacist Main Page
-from tkinter import Button, Label, Frame, Scrollbar, Listbox, END, messagebox, Entry, simpledialog
+from tkinter import Button, END, messagebox, Entry, simpledialog
 # Importing required modules from the main_page script
 from main_page import MainPage, sqlite3
 from main_page import messagebox

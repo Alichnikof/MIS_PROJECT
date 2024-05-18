@@ -45,7 +45,7 @@ cursor.execute(
 cursor.execute(
     "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('Daniel', 'Garcia', '1995-04-18')")
 cursor.execute(
-    "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('Pharma', 'Prout', '1998-08-18')")
+    "INSERT INTO Person (firstname, familyname, dateofbirth) VALUES ('Pharma', 'Boss', '1998-08-18')")
 
 # Inserting example doctors into the database
 cursor.execute(
@@ -71,7 +71,7 @@ cursor.execute(
 cursor.execute(
     "INSERT INTO Medicine (Med_name, content_quantity) VALUES ('Amoxicillin', 10)")
 cursor.execute(
-    "INSERT INTO Medicine (Med_name, content_quantity) VALUES ('Aspirin', 2)")
+    "INSERT INTO Medicine (Med_name, content_quantity) VALUES ('Aspirin', 1)")
 
 # Making prescriptions from doctors to patients into the database
 cursor.execute(

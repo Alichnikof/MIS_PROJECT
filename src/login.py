@@ -1,4 +1,5 @@
 # Pharmacy Management System - Login Portal
+import re
 import tkinter as tk
 from tkinter import messagebox, ttk
 import sqlite3
@@ -45,6 +46,13 @@ class LoginPortal:  # Class representing the login portal functionality
         self.register_button.grid(
             row=4, column=0, columnspan=2, padx=5, pady=10)
 
+    def validate_email(self, email):
+        """Validate email format and disallow certain special characters."""
+        if re.match(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$", email):
+            if not any(char in email for char in "#!$%&'*+/=?^_`{|}~"):
+                return True
+        return False
+
     def login(self):
         """Authenticate the user and perform login."""
         # Functionality for login button
@@ -54,6 +62,11 @@ class LoginPortal:  # Class representing the login portal functionality
         if not email or not password:  # If no email/password inserted
             messagebox.showerror(
                 "Error", "Please enter both email and password.")
+            return
+
+        # Validate email format
+        if not self.validate_email(email):
+            messagebox.showerror("Error", "Invalid email format.")
             return
         # Authenticate user
         user = self.authenticate_user(email, password)
@@ -159,6 +172,10 @@ class LoginPortal:  # Class representing the login portal functionality
         # If no Credentials inserted
         if not (first_name and last_name and dob and email and password and user_type):
             messagebox.showerror("Error", "Please fill in all fields.")
+            return
+        # Validate email format
+        if not self.validate_email(email):
+            messagebox.showerror("Error", "Invalid email format.")
             return
         # Insert into Person table
         try:  # Connect to DB
